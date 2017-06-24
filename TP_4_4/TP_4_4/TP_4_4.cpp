@@ -11,18 +11,13 @@ HINSTANCE hInst;                                // bie¿¹ce wyst¹pienie
 WCHAR szTitle[MAX_LOADSTRING];                  // Tekst paska tytu³u
 WCHAR szWindowClass[MAX_LOADSTRING];            // nazwa klasy okna g³ównego
 
+
 // Przeka¿ dalej deklaracje funkcji do³¹czonych w tym module kodu:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-void MyOnPaint(HDC hdc)
-{
-	Graphics graphics(hdc);
-	Pen pen(Color(255, 0, 0, 255));
-	graphics.DrawLine(&pen, 0, 0, 200, 100);
-}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -32,10 +27,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: W tym miejscu umieœæ kod.
+	//Inicjalizacja GDI
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR           gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+	
+	// TODO: W tym miejscu umieœæ kod.
 
     // Zainicjuj ci¹gi globalne
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

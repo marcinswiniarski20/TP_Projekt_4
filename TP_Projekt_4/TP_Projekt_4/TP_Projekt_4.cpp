@@ -17,11 +17,28 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-void MyOnPaint(HDC hdc)
+void DrawTheRope(HDC hdc)
 {
 	Graphics graphics(hdc);
-	Pen pen(Color(255, 0, 0, 255));
-	graphics.DrawLine(&pen, 50, 0, 50, 400);
+	Pen pen(Color(255, 0, 0, 0));
+	graphics.DrawLine(&pen, 293, 127, 293, 380);
+}
+
+void GetImage(HDC hdc, HWND hwnd) 
+{
+	HBITMAP hbmObraz;
+	BITMAP bmInfo;
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"c:\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	HDC hdcNowy = CreateCompatibleDC(NULL);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
+	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
+	hdc = GetDC(hwnd);
+	BitBlt(hdc, 50, 50, bmInfo.bmWidth, bmInfo.bmHeight, hdcNowy, 0, 0, SRCCOPY);
+	ReleaseDC(hwnd, hdc);
+
+	DeleteObject(hbmObraz); // kasowanie bitmapy
+	SelectObject(hdcNowy, hbmOld);
+	DeleteDC(hdcNowy);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -110,7 +127,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // Przechowuj dojœcie wyst¹pienia w zmiennej globalnej
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      0, 0, 800, 550, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -159,7 +176,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: tutaj dodaj kod rysowania u¿ywaj¹cy elementu hdc...
-			MyOnPaint(hdc);
+			GetImage(hdc, hWnd);
+			DrawTheRope(hdc);
             EndPaint(hWnd, &ps);
         }
         break;

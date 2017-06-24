@@ -8,7 +8,7 @@
 
 //pozycja liny dzwigu(do zmian)
 int position_x = 293; 
-int postiion_y = 380;
+int position_y = 380;
 
 // Zmienne globalne:
 HINSTANCE hInst;                                // bie¿¹ce wyst¹pienie
@@ -21,18 +21,28 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-void DrawTheRope(HDC hdc)
+void DrawTheRope(HWND hWnd)
 {
+	HDC hdc = GetDC(hWnd);
 	Graphics graphics(hdc);
 	Pen pen(Color(255, 0, 0, 0));
-	graphics.DrawLine(&pen, position_x, 127, position_x, postiion_y);
+	graphics.DrawLine(&pen, position_x, 127, position_x, position_y);
+}
+
+void ClearTheRope(HWND hWnd)
+{
+	HDC hdc = GetDC(hWnd);
+	Graphics graphics(hdc);
+	Pen pen(Color(255, 255, 255, 255));
+	graphics.DrawLine(&pen, position_x, 127, position_x, position_y);
+
 }
 
 void GetImage(HDC hdc, HWND hwnd) 
 {
 	HBITMAP hbmObraz;
 	BITMAP bmInfo;
-	hbmObraz = (HBITMAP) LoadImage(NULL, L"c:\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	HDC hdcNowy = CreateCompatibleDC(NULL);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
 	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
@@ -162,8 +172,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		switch ((int)wParam)
 		{
+		case VK_RIGHT:
+			if (position_x <= 710) {
+				ClearTheRope(hWnd);
+				position_x += 2;
+				DrawTheRope(hWnd);
+			}
+		break;
+		case VK_LEFT:
+			if (position_x >= 292) {
+				ClearTheRope(hWnd);
+				position_x -= 2;
+				DrawTheRope(hWnd);
+			}
+			break;
 		case VK_UP:
-			MessageBox(hWnd, L"Wcisnieto klawisz", L"Tak", MB_ICONINFORMATION);
+			if (position_y >= 148) {
+				ClearTheRope(hWnd);
+				position_y -= 2;
+				DrawTheRope(hWnd);
+			}
+			break;
+		case VK_DOWN:
+			if (position_y <= 380) {
+				ClearTheRope(hWnd);
+				position_y += 2;
+				DrawTheRope(hWnd);
+			}
 			break;
 		}
 	}
@@ -190,7 +225,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: tutaj dodaj kod rysowania u¿ywaj¹cy elementu hdc...
 			GetImage(hdc, hWnd);
-			DrawTheRope(hdc);
+			DrawTheRope(hWnd);
             EndPaint(hWnd, &ps);
         }
         break;

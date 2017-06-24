@@ -20,6 +20,8 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+HWND CreateWeight;
+HWND ButtonArea;
 
 void DrawTheRope(HDC hdc)
 {
@@ -32,7 +34,7 @@ void GetImage(HDC hdc, HWND hwnd)
 {
 	HBITMAP hbmObraz;
 	BITMAP bmInfo;
-	hbmObraz = (HBITMAP) LoadImage(NULL, L"c:\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"D:\\Projects\\TP_Projekt_4\\TP_Projekt_4\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	HDC hdcNowy = CreateCompatibleDC(NULL);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
 	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
@@ -44,6 +46,8 @@ void GetImage(HDC hdc, HWND hwnd)
 	SelectObject(hdcNowy, hbmOld);
 	DeleteDC(hdcNowy);
 }
+
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -72,8 +76,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_TP_PROJEKT_4));
-
     MSG msg;
+
+	
 
     // G³ówna pêtla wiadomoœci:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -131,7 +136,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // Przechowuj dojœcie wyst¹pienia w zmiennej globalnej
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      0, 0, 800, 550, nullptr, nullptr, hInstance, nullptr);
+      0, 0, 900, 550, nullptr, nullptr, hInstance, nullptr);
+   ButtonArea = CreateWindowEx(0, L"BUTTON", NULL , WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 735, 80, 110, 300, hWnd, NULL, hInstance, NULL);
+   CreateWeight = CreateWindowEx(0, L"BUTTON", L"Sth to lift", WS_CHILD | WS_VISIBLE, 740, 100, 100, 30, hWnd, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -169,8 +176,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
     case WM_COMMAND:
         {
+			HDC hdcWindow = GetDC(hWnd);
             int wmId = LOWORD(wParam);
             // Analizuj zaznaczenia menu:
+			if ((HWND)lParam == CreateWeight) Rectangle(hdcWindow, 330, 405, 280, 455);
+			
             switch (wmId)
             {
             case IDM_ABOUT:
@@ -182,7 +192,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
-        }
+			
+			}
         break;
     case WM_PAINT:
         {

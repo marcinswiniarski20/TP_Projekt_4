@@ -6,6 +6,10 @@
 
 #define MAX_LOADSTRING 100
 
+//pozycja liny dzwigu(do zmian)
+int position_x = 293; 
+int postiion_y = 380;
+
 // Zmienne globalne:
 HINSTANCE hInst;                                // bie¿¹ce wyst¹pienie
 WCHAR szTitle[MAX_LOADSTRING];                  // Tekst paska tytu³u
@@ -17,6 +21,30 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+void DrawTheRope(HDC hdc)
+{
+	Graphics graphics(hdc);
+	Pen pen(Color(255, 0, 0, 0));
+	graphics.DrawLine(&pen, position_x, 127, position_x, postiion_y);
+}
+
+void GetImage(HDC hdc, HWND hwnd) 
+{
+	HBITMAP hbmObraz;
+	BITMAP bmInfo;
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"c:\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	HDC hdcNowy = CreateCompatibleDC(NULL);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
+	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
+	hdc = GetDC(hwnd);
+	BitBlt(hdc, 50, 50, bmInfo.bmWidth, bmInfo.bmHeight, hdcNowy, 0, 0, SRCCOPY);
+	ReleaseDC(hwnd, hdc);
+
+	DeleteObject(hbmObraz); // kasowanie bitmapy
+	SelectObject(hdcNowy, hbmOld);
+	DeleteDC(hdcNowy);
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -24,6 +52,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+
+	//Inicjalizacja GDI+
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR           gdiplusToken;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
     // TODO: W tym miejscu umieœæ kod.
 
@@ -51,7 +84,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
     }
-
+	GdiplusShutdown(gdiplusToken);
     return (int) msg.wParam;
 }
 
@@ -98,7 +131,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // Przechowuj dojœcie wyst¹pienia w zmiennej globalnej
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      0, 0, 800, 550, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -125,6 +158,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_KEYDOWN:
+	{
+		switch ((int)wParam)
+		{
+		case VK_UP:
+			MessageBox(hWnd, L"Wcisnieto klawisz", L"Tak", MB_ICONINFORMATION);
+			break;
+		}
+	}
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -147,6 +189,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: tutaj dodaj kod rysowania u¿ywaj¹cy elementu hdc...
+			GetImage(hdc, hWnd);
+			DrawTheRope(hdc);
             EndPaint(hWnd, &ps);
         }
         break;

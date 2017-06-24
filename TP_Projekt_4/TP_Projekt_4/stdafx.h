@@ -10,6 +10,9 @@
 #define WIN32_LEAN_AND_MEAN             // Wyklucz rzadko u¿ywane rzeczy z nag³ówków systemu Windows
 // Pliki nag³ówkowe systemu Windows:
 #include <windows.h>
+#include <objidl.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
 
 // Pliki nag³ówkowe œrodowiska uruchomieniowego C
 #include <stdlib.h>

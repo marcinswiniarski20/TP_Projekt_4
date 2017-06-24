@@ -6,6 +6,10 @@
 
 #define MAX_LOADSTRING 100
 
+//pozycja liny dzwigu(do zmian)
+int position_x = 293; 
+int postiion_y = 380;
+
 // Zmienne globalne:
 HINSTANCE hInst;                                // bie¿¹ce wyst¹pienie
 WCHAR szTitle[MAX_LOADSTRING];                  // Tekst paska tytu³u
@@ -21,7 +25,7 @@ void DrawTheRope(HDC hdc)
 {
 	Graphics graphics(hdc);
 	Pen pen(Color(255, 0, 0, 0));
-	graphics.DrawLine(&pen, 293, 127, 293, 380);
+	graphics.DrawLine(&pen, position_x, 127, position_x, postiion_y);
 }
 
 void GetImage(HDC hdc, HWND hwnd) 
@@ -154,6 +158,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_KEYDOWN:
+	{
+		switch ((int)wParam)
+		{
+		case VK_UP:
+			MessageBox(hWnd, L"Wcisnieto klawisz", L"Tak", MB_ICONINFORMATION);
+			break;
+		}
+	}
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);

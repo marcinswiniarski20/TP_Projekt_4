@@ -56,7 +56,7 @@ void GetImage(HDC hdc, HWND hwnd)
 {
 	HBITMAP hbmObraz;
 	BITMAP bmInfo;
-	hbmObraz = (HBITMAP) LoadImage(NULL, L"D:\\Projects\\TP_Projekt_4\\TP_Projekt_4\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	HDC hdcNowy = CreateCompatibleDC(NULL);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
 	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
@@ -343,7 +343,6 @@ void DrawTheRope(HWND hWnd)
 	Graphics graphics(hdc);
 	Pen pen(Color(255, 0, 0, 0));
 	graphics.DrawLine(&pen, rope.x, 127, rope.x, rope.y);
-	graphics.DrawLine(&pen, rope.x - 15, rope.y, rope.x + 15, rope.y);
 	ReleaseDC(hWnd, hdc);
 }
 
@@ -353,7 +352,6 @@ void ClearTheRope(HWND hWnd)
 	Graphics graphics(hdc);
 	Pen pen(Color(255, 255, 255, 255));
 	graphics.DrawLine(&pen, rope.x, 127, rope.x, rope.y);
-	graphics.DrawLine(&pen, rope.x - 15, rope.y, rope.x + 15, rope.y);
 	ReleaseDC(hWnd, hdc);
 }
 

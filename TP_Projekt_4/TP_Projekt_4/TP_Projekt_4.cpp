@@ -3,8 +3,12 @@
 
 #include "stdafx.h"
 #include "TP_Projekt_4.h"
+#include "ctime"
+#include "cstdlib"
 
 #define MAX_LOADSTRING 100
+
+
 
 //pozycja liny dzwigu(do zmian)
 struct position 
@@ -14,12 +18,15 @@ struct position
 };
 struct chest
 {
-	int x = 292;
+	int x;
 	int y = 370;
 	bool CheckTheHook = false;
+	int waga = 100;
 };
 position rope;
 chest object;
+
+	
 
 
 // Zmienne globalne:
@@ -32,12 +39,37 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+HWND weight250;
+HWND weight500;
+HWND weight750;
+HWND weight1000;
+HWND ButtonArea;
 
 void DrawTheRope(HWND);
 void ClearTheRope(HWND);
 void GetImage(HDC, HWND);
 void DrawTheObject(HWND);
 void ClearTheObject(HWND);
+
+
+void GetImage(HDC hdc, HWND hwnd) 
+{
+	HBITMAP hbmObraz;
+	BITMAP bmInfo;
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"D:\\Projects\\TP_Projekt_4\\TP_Projekt_4\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	HDC hdcNowy = CreateCompatibleDC(NULL);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
+	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
+	hdc = GetDC(hwnd);
+	BitBlt(hdc, 50, 50, bmInfo.bmWidth, bmInfo.bmHeight, hdcNowy, 0, 0, SRCCOPY);
+	ReleaseDC(hwnd, hdc);
+
+	DeleteObject(hbmObraz); // kasowanie bitmapy
+	SelectObject(hdcNowy, hbmOld);
+	DeleteDC(hdcNowy);
+}
+
+
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -47,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
+	srand(time(NULL));
 	//Inicjalizacja GDI+
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR           gdiplusToken;
@@ -67,8 +99,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_TP_PROJEKT_4));
-
     MSG msg;
+
+	
 
     // G³ówna pêtla wiadomoœci:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -124,9 +157,18 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Przechowuj dojœcie wyst¹pienia w zmiennej globalnej
-
+   
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      0, 0, 800, 550, nullptr, nullptr, hInstance, nullptr);
+      0, 0, 900, 550, nullptr, nullptr, hInstance, nullptr);
+   ButtonArea = CreateWindowEx(0, L"BUTTON", L"Weight" , WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 735, 80, 110, 300, hWnd, NULL, hInstance, NULL);
+   weight250 = CreateWindowEx(0, L"BUTTON", L"250kg", WS_CHILD | WS_VISIBLE, 740, 100, 100, 30, hWnd, NULL, hInstance, NULL);
+   weight500 = CreateWindowEx(0, L"BUTTON", L"500kg", WS_CHILD | WS_VISIBLE, 740, 140, 100, 30, hWnd, NULL, hInstance, NULL);
+   weight750 = CreateWindowEx(0, L"BUTTON", L"750kg", WS_CHILD | WS_VISIBLE, 740, 180, 100, 30, hWnd, NULL, hInstance, NULL);
+   weight1000 = CreateWindowEx(0, L"BUTTON", L"1000kg", WS_CHILD | WS_VISIBLE, 740, 220, 100, 30, hWnd, NULL, hInstance, NULL);
+
+
+   srand(time(NULL));
+   object.x =  292 +rand()%(700-292+1);
 
    if (!hWnd)
    {
@@ -151,7 +193,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	
+	srand(time(NULL));
     switch (message)
     {
 	case WM_KEYDOWN:
@@ -218,14 +260,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case 0x5A:
 			if ((rope.x == object.x) && (rope.y == object.y))
-				object.CheckTheHook = false;					
+			{
+				object.CheckTheHook = false;
+				while (object.y < 370) {
+					ClearTheObject(hWnd);
+					object.y += 1;
+					DrawTheObject(hWnd);
+					Sleep(0.5);
+				}
+				
+				
+			}
 			break;
 		}
 	}
     case WM_COMMAND:
         {
+			HDC hdcWindow = GetDC(hWnd);
             int wmId = LOWORD(wParam);
-            // Analizuj zaznaczenia menu:
+ 
+			//if ((HWND)lParam == weight250) object.waga = 250;
+			//if ((HWND)lParam == weight500) object.waga = 500;
+			//if ((HWND)lParam == weight750) object.waga = 750;
+			//if ((HWND)lParam == weight1000) object.waga = 1000;
+
             switch (wmId)
             {
             case IDM_ABOUT:
@@ -237,14 +295,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
-        }
+			
+			}
         break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: tutaj dodaj kod rysowania u¿ywaj¹cy elementu hdc...
-			
 			GetImage(hdc, hWnd);
 			DrawTheRope(hWnd);
 			DrawTheObject(hWnd);
@@ -260,7 +317,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-//Procedura obs³ugi wiadomoœci dla okna informacji o programie.
+
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
@@ -300,23 +357,6 @@ void ClearTheRope(HWND hWnd)
 	ReleaseDC(hWnd, hdc);
 }
 
-void GetImage(HDC hdc, HWND hwnd)
-{
-	HBITMAP hbmObraz;
-	BITMAP bmInfo;
-	hbmObraz = (HBITMAP)LoadImage(NULL, L"dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-	HDC hdcNowy = CreateCompatibleDC(NULL);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
-	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
-	hdc = GetDC(hwnd);
-	BitBlt(hdc, 50, 50, bmInfo.bmWidth, bmInfo.bmHeight, hdcNowy, 0, 0, SRCCOPY);
-	ReleaseDC(hwnd, hdc);
-
-	DeleteObject(hbmObraz); // kasowanie bitmapy
-	SelectObject(hdcNowy, hbmOld);
-	DeleteDC(hdcNowy);
-}
-
 void DrawTheObject(HWND hWnd)
 {
 	HDC hdc = GetDC(hWnd);
@@ -331,6 +371,7 @@ void DrawTheObject(HWND hWnd)
 
 	ReleaseDC(hWnd, hdc);
 }
+
 void ClearTheObject(HWND hWnd)
 {
 	HDC hdc = GetDC(hWnd);

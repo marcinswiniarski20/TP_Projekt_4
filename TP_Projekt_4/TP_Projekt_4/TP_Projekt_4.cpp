@@ -56,6 +56,23 @@ void GetImage(HDC hdc, HWND hwnd)
 	DeleteDC(hdcNowy);
 }
 
+void CreateObject(HWND hWnd)
+{
+	HDC hdc = GetDC(hWnd);
+	Graphics graphics(hdc);
+	Pen pen(Color(255, 0, 0, 0));
+	graphics.DrawLine(&pen, position_x - 15, position_y, position_x + 15, position_y);
+	graphics.DrawLine(&pen, position_x - 15, position_y, position_x - 15, position_y + 60);
+	graphics.DrawLine(&pen, position_x + 15, position_y, position_x + 15, position_y + 60);
+	graphics.DrawLine(&pen, position_x - 15, position_y + 60, position_x + 15, position_y + 60);
+	graphics.DrawLine(&pen, position_x - 15, position_y, position_x + 15, position_y + 60);
+	graphics.DrawLine(&pen, position_x + 15, position_y, position_x - 15, position_y + 60);
+
+	ReleaseDC(hWnd, hdc);
+}
+
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -225,8 +242,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: tutaj dodaj kod rysowania u¿ywaj¹cy elementu hdc...
+			
 			GetImage(hdc, hWnd);
 			DrawTheRope(hWnd);
+			CreateObject(hWnd);
             EndPaint(hWnd, &ps);
         }
         break;

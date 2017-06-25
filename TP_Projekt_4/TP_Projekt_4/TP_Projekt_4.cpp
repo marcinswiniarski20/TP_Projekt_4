@@ -286,6 +286,7 @@ void DrawTheRope(HWND hWnd)
 	Graphics graphics(hdc);
 	Pen pen(Color(255, 0, 0, 0));
 	graphics.DrawLine(&pen, rope.x, 127, rope.x, rope.y);
+	graphics.DrawLine(&pen, rope.x - 15, rope.y, rope.x + 15, rope.y);
 	ReleaseDC(hWnd, hdc);
 }
 
@@ -295,6 +296,7 @@ void ClearTheRope(HWND hWnd)
 	Graphics graphics(hdc);
 	Pen pen(Color(255, 255, 255, 255));
 	graphics.DrawLine(&pen, rope.x, 127, rope.x, rope.y);
+	graphics.DrawLine(&pen, rope.x - 15, rope.y, rope.x + 15, rope.y);
 	ReleaseDC(hWnd, hdc);
 }
 

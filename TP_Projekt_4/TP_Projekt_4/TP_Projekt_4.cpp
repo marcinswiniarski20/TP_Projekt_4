@@ -21,7 +21,7 @@ struct chest
 	int x;
 	int y = 370;
 	bool CheckTheHook = false;
-	int waga = 100;
+	int waga=100;
 };
 position rope;
 chest object;
@@ -39,11 +39,8 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-HWND weight250;
-HWND weight500;
-HWND weight750;
-HWND weight1000;
-HWND ButtonArea;
+HWND losujwage;
+
 
 void DrawTheRope(HWND);
 void ClearTheRope(HWND);
@@ -56,7 +53,7 @@ void GetImage(HDC hdc, HWND hwnd)
 {
 	HBITMAP hbmObraz;
 	BITMAP bmInfo;
-	hbmObraz = (HBITMAP) LoadImage(NULL, L"D:\\Projects\\TP_Projekt_4\\TP_Projekt_4\\dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	hbmObraz = (HBITMAP) LoadImage(NULL, L"dzwig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	HDC hdcNowy = CreateCompatibleDC(NULL);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcNowy, hbmObraz);
 	GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
@@ -79,13 +76,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-	srand(time(NULL));
+
 	//Inicjalizacja GDI+
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR           gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
     // TODO: W tym miejscu umieœæ kod.
+	srand(time(NULL));
 
     // Zainicjuj ci¹gi globalne
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -160,15 +158,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       0, 0, 900, 550, nullptr, nullptr, hInstance, nullptr);
-   ButtonArea = CreateWindowEx(0, L"BUTTON", L"Weight" , WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 735, 80, 110, 300, hWnd, NULL, hInstance, NULL);
-   weight250 = CreateWindowEx(0, L"BUTTON", L"250kg", WS_CHILD | WS_VISIBLE, 740, 100, 100, 30, hWnd, NULL, hInstance, NULL);
-   weight500 = CreateWindowEx(0, L"BUTTON", L"500kg", WS_CHILD | WS_VISIBLE, 740, 140, 100, 30, hWnd, NULL, hInstance, NULL);
-   weight750 = CreateWindowEx(0, L"BUTTON", L"750kg", WS_CHILD | WS_VISIBLE, 740, 180, 100, 30, hWnd, NULL, hInstance, NULL);
-   weight1000 = CreateWindowEx(0, L"BUTTON", L"1000kg", WS_CHILD | WS_VISIBLE, 740, 220, 100, 30, hWnd, NULL, hInstance, NULL);
+ 
+   losujwage = CreateWindowEx(0, L"BUTTON", L"LOSUJ WAGE", WS_CHILD | WS_VISIBLE, 740, 100, 100, 30, hWnd, NULL, hInstance, NULL);
+  
 
 
-   srand(time(NULL));
+   
    object.x =  292 +rand()%(700-292+1);
+   
 
    if (!hWnd)
    {
@@ -193,36 +190,36 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	srand(time(NULL));
+
     switch (message)
     {
-	case WM_KEYDOWN:
-	{
-		switch ((int)wParam)
+		case WM_KEYDOWN:
 		{
-		case VK_RIGHT:
-			if (rope.x <= 710) {
-				ClearTheRope(hWnd);
-				rope.x += 2;
-				DrawTheRope(hWnd);
-				if (object.CheckTheHook)
-				{
-					ClearTheObject(hWnd);
-					object.x += 2;
-					DrawTheObject(hWnd);
-				}
+			switch ((int)wParam)
+			{
+			case VK_RIGHT:
+				if (rope.x <= 710) {
+					ClearTheRope(hWnd);
+					rope.x += 1;
+					DrawTheRope(hWnd);
+					if (object.CheckTheHook)
+					{
+						ClearTheObject(hWnd);
+						object.x += 1;
+						DrawTheObject(hWnd);
+					}
 				
 			}
 		break;
 		case VK_LEFT:
 			if (rope.x >= 292) {
 				ClearTheRope(hWnd);
-				rope.x -= 2;
+				rope.x -= 1;
 				DrawTheRope(hWnd);
 				if (object.CheckTheHook)
 				{
 					ClearTheObject(hWnd);
-					object.x -= 2;
+					object.x -= 1;
 					DrawTheObject(hWnd);
 				}
 			}
@@ -255,8 +252,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case VK_SPACE:
-			if ((rope.x == object.x) && (rope.y == object.y))
-				object.CheckTheHook = true;
+			
+			
+			if ((rope.x == object.x) && (rope.y == object.y)) {
+				if (object.waga >= 300) {
+					MessageBox(hWnd, L"Nie uda³o sie podniesc, za gruby sprzet...", L"Komp nie daje rady ;/", MB_OK);
+				}
+				else object.CheckTheHook = true;
+			}
 			break;
 		case 0x5A:
 			if ((rope.x == object.x) && (rope.y == object.y))
@@ -266,23 +269,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					ClearTheObject(hWnd);
 					object.y += 1;
 					DrawTheObject(hWnd);
-					Sleep(0.5);
+					Sleep(1);
 				}
 				
 				
 			}
 			break;
 		}
-	}
+		}
+		break;
     case WM_COMMAND:
         {
 			HDC hdcWindow = GetDC(hWnd);
             int wmId = LOWORD(wParam);
  
-			//if ((HWND)lParam == weight250) object.waga = 250;
-			//if ((HWND)lParam == weight500) object.waga = 500;
-			//if ((HWND)lParam == weight750) object.waga = 750;
-			//if ((HWND)lParam == weight1000) object.waga = 1000;
+			if ((HWND)lParam == losujwage) {	
+				object.waga = 1+ rand() % (400); 
+				wchar_t buffer[256];
+				wsprintfW(buffer, L"%d", object.waga);
+				//MessageBoxW(nullptr, buffer, buffer, MB_OK);
+				MessageBox(hWnd, buffer, L"Zmieniasz wage.", MB_OK);
+			
+			}
+			
+			
 
             switch (wmId)
             {
@@ -295,7 +305,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
-			
+			ReleaseDC(hWnd, hdcWindow);
 			}
         break;
     case WM_PAINT:
